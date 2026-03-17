@@ -1,5 +1,7 @@
 @echo off
 setlocal enabledelayedexpansion
+set "ROOT_DIR=%~dp0"
+cd /d "%ROOT_DIR%"
 
 echo === Starting Whisper.cpp Build Process ===
 echo.
@@ -130,6 +132,8 @@ if exist "whisper.cpp\%MODEL_DIR%\%MODEL_NAME%" (
         echo Failed to download model
         goto :eof
     )
+
+    cd /d "%ROOT_DIR%"
 )
 
 echo Creating run script...
@@ -228,9 +232,16 @@ if %ERRORLEVEL% neq 0 (
 echo Waiting for 5 seconds...
 timeout /t 5 /nobreak >nul
 
-copy "whisper.cpp\%MODEL_DIR%\%MODEL_NAME%" "%PACKAGE_NAME%\models\"
-if %ERRORLEVEL% neq 0 (
-    echo Failed to copy model
+if exist "whisper.cpp\%MODEL_DIR%\%MODEL_NAME%" (
+    copy "whisper.cpp\%MODEL_DIR%\%MODEL_NAME%" "%PACKAGE_NAME%\models\"
+    if %ERRORLEVEL% neq 0 (
+        echo Failed to copy model from whisper.cpp\%MODEL_DIR%
+        goto :eof
+    )
+) else if exist "%PACKAGE_NAME%\models\%MODEL_NAME%" (
+    echo Model already present in %PACKAGE_NAME%\models\%MODEL_NAME%
+) else (
+    echo Failed to locate model %MODEL_NAME% in whisper.cpp\%MODEL_DIR% or %PACKAGE_NAME%\models
     goto :eof
 )
 
