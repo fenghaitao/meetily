@@ -129,6 +129,7 @@ services:
       - whisper_models:/models
     environment:
       - MODEL_NAME=${MODEL_NAME:-base.en}
+      - HF_ENDPOINT=${HF_ENDPOINT:-https://huggingface.co}
     command: |
       sh -c "
         echo '🔍 Checking for model: ggml-\${MODEL_NAME}.bin'
@@ -143,7 +144,7 @@ services:
             --retry-delay 5 \
             --retry-connrefused \
             -o /models/ggml-\${MODEL_NAME}.bin.tmp \
-            https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-\${MODEL_NAME}.bin
+            \${HF_ENDPOINT%/}/ggerganov/whisper.cpp/resolve/main/ggml-\${MODEL_NAME}.bin
           
           # Verify download completed successfully  
           if [ -s /models/ggml-\${MODEL_NAME}.bin.tmp ]; then

@@ -6,7 +6,10 @@
 #src="https://ggml.ggerganov.com"
 #pfx="ggml-model-whisper"
 
-src="https://huggingface.co/ggerganov/whisper.cpp"
+HF_ENDPOINT="${HF_ENDPOINT:-https://huggingface.co}"
+HF_ENDPOINT="${HF_ENDPOINT%/}"
+
+src="$HF_ENDPOINT/ggerganov/whisper.cpp"
 pfx="resolve/main/ggml"
 
 BOLD="\033[1m"
@@ -92,7 +95,7 @@ fi
 
 # check if model contains `tdrz` and update the src and pfx accordingly
 if echo "$model" | grep -q "tdrz"; then
-    src="https://huggingface.co/akashmjn/tinydiarize-whisper.cpp"
+    src="$HF_ENDPOINT/akashmjn/tinydiarize-whisper.cpp"
     pfx="resolve/main/ggml"
 fi
 

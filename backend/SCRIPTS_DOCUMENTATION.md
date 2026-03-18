@@ -349,6 +349,7 @@ start_whisper_server.cmd [MODEL_NAME]
 - Quantized variants (q5_1, q8_0) for smaller file sizes
 - Special tdrz models for speaker diarization
 - Automatic source URL switching based on model type
+- Honors `HF_ENDPOINT` for Hugging Face mirrors such as `https://hf-mirror.com`
 - PowerShell BITS transfer (Windows) or curl/wget (Unix)
 
 **Usage**:

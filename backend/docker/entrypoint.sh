@@ -41,6 +41,17 @@ WHISPER_LANGUAGE=${WHISPER_LANGUAGE:-en}
 WHISPER_TRANSLATE=${WHISPER_TRANSLATE:-false}
 WHISPER_DIARIZE=${WHISPER_DIARIZE:-false}
 WHISPER_PRINT_PROGRESS=${WHISPER_PRINT_PROGRESS:-true}
+HF_ENDPOINT=${HF_ENDPOINT:-https://huggingface.co}
+HF_ENDPOINT=${HF_ENDPOINT%/}
+
+hf_repo_url() {
+    local repo_path="$1"
+    printf "%s/%s" "$HF_ENDPOINT" "$repo_path"
+}
+
+hf_host() {
+    printf "%s" "$HF_ENDPOINT" | sed -E 's#^https?://([^/]+).*$#\1#'
+}
 
 # Function to detect available GPUs (silent version for use in command building)
 detect_gpu_silent() {
@@ -278,7 +289,7 @@ ensure_model() {
         mkdir -p "$(dirname "$model_path")"
         
         # Download model with progress
-        local download_url="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-${model_size}.bin"
+        local download_url="$(hf_repo_url "ggerganov/whisper.cpp/resolve/main/ggml-${model_size}.bin")"
         
         if download_model_with_progress "$model_path" "$download_url" "$model_size"; then
             log_info "🎉 Model is ready for use!"
@@ -302,7 +313,7 @@ ensure_model() {
     if [[ "$model_size" != "tiny.en" && "$model_size" != "base.en" ]]; then
         log_warn "🔄 Attempting fallback to base.en model..."
         local fallback_path="models/ggml-base.en.bin"
-        local fallback_url="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin"
+        local fallback_url="$(hf_repo_url "ggerganov/whisper.cpp/resolve/main/ggml-base.en.bin")"
         
         if download_model_with_progress "$fallback_path" "$fallback_url" "base.en"; then
             log_info "✅ Fallback model downloaded successfully!"
@@ -498,7 +509,7 @@ test_connectivity() {
     
     # Test external connectivity
     log_info "Testing external connectivity..."
-    if curl -s --connect-timeout 5 https://huggingface.co >/dev/null; then
+    if curl -s --connect-timeout 5 "$HF_ENDPOINT" >/dev/null; then
         log_info "✓ External connectivity OK"
     else
         log_warn "✗ External connectivity failed"
@@ -506,7 +517,7 @@ test_connectivity() {
     
     # Test DNS resolution
     log_info "Testing DNS resolution..."
-    if nslookup huggingface.co >/dev/null 2>&1; then
+    if nslookup "$(hf_host)" >/dev/null 2>&1; then
         log_info "✓ DNS resolution OK"
     else
         log_warn "✗ DNS resolution failed"

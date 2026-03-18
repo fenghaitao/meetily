@@ -5,6 +5,9 @@ set models_path=%CD%
 for %%d in (%~dp0..) do set root_path=%%~fd
 popd
 
+if not defined HF_ENDPOINT set "HF_ENDPOINT=https://huggingface.co"
+if "%HF_ENDPOINT:~-1%"=="/" set "HF_ENDPOINT=%HF_ENDPOINT:~0,-1%"
+
 set models=tiny.en tiny base.en base small.en small medium.en medium large-v1 large-v2 large-v3 large-v3-turbo tiny-q5_1 tiny.en-q5_1 tiny-q8_0 base-q5_1 base.en-q5_1 base-q8_0 small.en-tdrz small-q5_1 small.en-q5_1 small-q8_0 medium-q5_0 medium.en-q5_0 medium-q8_0 large-v2-q5_0 large-v2-q8_0 large-v3-q5_0 large-v3-turbo-q5_0 large-v3-turbo-q8_0
 
 set argc=0
@@ -59,9 +62,9 @@ if exist "%target_model%" (
 REM Check if model contains `tdrz` and update the src accordingly
 echo %model% | findstr /C:"tdrz" >nul
 if %ERRORLEVEL% equ 0 (
-    set "src=https://huggingface.co/akashmjn/tinydiarize-whisper.cpp/resolve/main"
+    set "src=%HF_ENDPOINT%/akashmjn/tinydiarize-whisper.cpp/resolve/main"
 ) else (
-    set "src=https://huggingface.co/ggerganov/whisper.cpp/resolve/main"
+    set "src=%HF_ENDPOINT%/ggerganov/whisper.cpp/resolve/main"
 )
 
 PowerShell -NoProfile -ExecutionPolicy Bypass -Command "Start-BitsTransfer -Source %src%/ggml-%model%.bin -Destination ggml-%model%.bin"

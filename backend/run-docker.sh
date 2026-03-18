@@ -1849,7 +1849,9 @@ manage_models() {
                 large*) log_info "📦 Size: ~1550 MB (best accuracy)" ;;
             esac
             
-            local download_url="https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-${model_name}.bin"
+            local hf_endpoint="${HF_ENDPOINT:-https://huggingface.co}"
+            hf_endpoint="${hf_endpoint%/}"
+            local download_url="${hf_endpoint}/ggerganov/whisper.cpp/resolve/main/ggml-${model_name}.bin"
             log_info "🌐 URL: $download_url"
             
             # Create a temporary file for download

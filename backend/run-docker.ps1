@@ -1396,7 +1396,8 @@ function Invoke-ModelsCommand {
                 "large*" { Write-Info "Size: ~1550 MB (best accuracy)" }
             }
             
-            $downloadUrl = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-$modelName.bin"
+            $hfEndpoint = if ($env:HF_ENDPOINT) { $env:HF_ENDPOINT.TrimEnd('/') } else { 'https://huggingface.co' }
+            $downloadUrl = "$hfEndpoint/ggerganov/whisper.cpp/resolve/main/ggml-$modelName.bin"
             Write-Info "URL: $downloadUrl"
             
             # Create a temporary file for download

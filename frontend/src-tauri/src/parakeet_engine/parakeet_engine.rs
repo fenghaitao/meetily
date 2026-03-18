@@ -2,6 +2,7 @@ use crate::parakeet_engine::model::ParakeetModel;
 use anyhow::{anyhow, Result};
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, HashSet};
+use std::env;
 use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::fs;
@@ -9,6 +10,24 @@ use tokio::io::{AsyncWriteExt, BufWriter};
 use std::time::{Duration, Instant};
 use tokio::sync::RwLock;
 use tokio::time::timeout;
+
+fn hf_endpoint() -> String {
+    env::var("HF_ENDPOINT")
+        .ok()
+        .map(|value| value.trim().trim_end_matches('/').to_string())
+        .filter(|value| !value.is_empty())
+        .unwrap_or_else(|| "https://huggingface.co".to_string())
+}
+
+fn parakeet_base_url(model_name: &str) -> String {
+    let repo = if model_name.contains("-v2-") {
+        "istupakov/parakeet-tdt-0.6b-v2-onnx"
+    } else {
+        "istupakov/parakeet-tdt-0.6b-v3-onnx"
+    };
+
+    format!("{}/{}/resolve/main", hf_endpoint(), repo)
+}
 
 /// Quantization type for Parakeet models
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
@@ -590,13 +609,7 @@ impl ParakeetEngine {
             }
         }
 
-        // HuggingFace base URL for Parakeet models (version-specific)
-        let base_url = if model_name.contains("-v2-") {
-            "https://huggingface.co/istupakov/parakeet-tdt-0.6b-v2-onnx/resolve/main"
-        } else {
-            // Default to v3 for v3 models
-            "https://meetily.towardsgeneralintelligence.com/models/parakeet-tdt-0.6b-v3-onnx"
-        };
+        let base_url = parakeet_base_url(model_name);
 
         // Determine which files to download based on quantization
         let files_to_download = match model_info.quantization {

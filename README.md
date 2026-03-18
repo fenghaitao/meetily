@@ -103,6 +103,20 @@ Whether you're a defense consultant, enterprise executive, legal professional, o
 
 ## Installation
 
+### Model Download Mirror
+
+If direct Hugging Face downloads are blocked or slow in your network, set `HF_ENDPOINT` before downloading Whisper or Parakeet models:
+
+```powershell
+$env:HF_ENDPOINT = "https://hf-mirror.com"
+```
+
+```bash
+export HF_ENDPOINT="https://hf-mirror.com"
+```
+
+Meetily's model downloaders will then fetch Hugging Face-hosted Whisper GGML files and Parakeet ONNX files through that mirror.
+
 ### 🪟 **Windows**
 
 1. Download the latest `x64-setup.exe` from [Releases](https://github.com/Zackriya-Solutions/meeting-minutes/releases/latest)
